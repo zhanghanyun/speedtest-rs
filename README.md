@@ -6,7 +6,7 @@ This is a very lightweight Speedtest implemented in [Rust](https://www.rust-lang
 
 ## Installation
 
-You can download the precompiled binary [relaese](https://github.com/zhanghanyun/speedtest-rs) 
+You can download the precompiled binary [relaese](https://github.com/zhanghanyun/speedtest-rs/releases) 
 
 ##### Build
 
