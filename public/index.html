@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Speedtest-rs</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    <style type="text/css">
+        html,body{
+            border:none; padding:0; margin:0;
+            background:#FFFFFF;
+            color:#202020;
+        }
+        body{
+            text-align:center;
+            font-family:"Roboto",sans-serif;
+        }
+        h1{
+            color:#404040;
+        }
+        #startStopBtn{
+            display:inline-block;
+            margin:0 auto;
+            color:#6060AA;
+            background-color:rgba(0,0,0,0);
+            border:0.15em solid #6060FF;
+            border-radius:0.3em;
+            transition:all 0.3s;
+            box-sizing:border-box;
+            width:8em; height:3em;
+            line-height:2.7em;
+            cursor:pointer;
+            box-shadow: 0 0 0 rgba(0,0,0,0.1), inset 0 0 0 rgba(0,0,0,0.1);
+        }
+        #startStopBtn:hover{
+            box-shadow: 0 0 2em rgba(0,0,0,0.1), inset 0 0 1em rgba(0,0,0,0.1);
+        }
+        #startStopBtn.running{
+            background-color:#FF3030;
+            border-color:#FF6060;
+            color:#FFFFFF;
+        }
+        #startStopBtn:before{
+            content:"Start";
+        }
+        #startStopBtn.running:before{
+            content:"Abort";
+        }
+        #test{
+            margin-top:3em;
+            margin-bottom:12em;
+        }
+        div.testArea{
+            display:inline-block;
+            width:14em;
+            height:9em;
+            position:relative;
+            box-sizing:border-box;
+        }
+        div.testName{
+            position:absolute;
+            top:0.1em; left:0;
+            width:100%;
+            font-size:1.4em;
+            z-index:9;
+        }
+        div.meterText{
+            position:absolute;
+            bottom:1.5em; left:0;
+            width:100%;
+            font-size:2.5em;
+            z-index:9;
+        }
+        #download{
+            color:#6060AA;
+        }
+        #upload{
+            color:#309030;
+        }
+        #ping{
+            color:#AA6060;
+        }
+        #jitter{
+            color: #b8902e;
+        }
+        div.meterText:empty:before{
+            color:#505050 !important;
+            content:"0.00";
+        }
+        div.unit{
+            position:absolute;
+            bottom:2em; left:0;
+            width:100%;
+            z-index:9;
+        }
+        div.testGroup{
+            display:inline-block;
+            margin-top: 33px;
+        }
+        @media all and (max-width:65em){
+            body{
+                font-size:1.5vw;
+            }
+        }
+        @media all and (max-width:40em){
+            body{
+                font-size:0.8em;
+            }
+            div.testGroup{
+                display:block;
+                margin: 0 auto;
+            }
+        }
+
+        .progress{
+            height: 30px;
+            width: 90%;
+            line-height: 35px;
+            background: #809495;
+            box-shadow: none;
+            padding: 6px;
+            margin:0 auto;
+            overflow: visible;
+            border-radius:10px;
+        }
+        .progress:after{
+            content: "";
+            display: block;
+            border-top: 4px dashed #fff;
+            margin-top:8px;
+        }
+        .progress .progress-bar{
+            position: relative;
+            border-radius: 10px 0 0 10px;
+            animation: animate-positive 2s;
+        }
+        .progress .progress-bar span{
+            position: absolute;
+            top: -50px;
+            right: -40px;
+            color: #fff;
+            display: block;
+            font-size: 17px;
+            font-weight: bold;
+            padding: 5px 7px;
+            background: #333;
+            border-radius: 0 0 5px 5px;
+        }
+        .progress .progress-bar span:before{
+            content: "";
+            position: absolute;
+            bottom: -14px;
+            left: 18px;
+            border: 7px solid transparent;
+            border-top: 7px solid #333;
+        }
+        .progress .progress-bar span:after{
+            content: "\f072";
+            font-family: fontawesome;
+            font-size: 48px;
+            color: #333;
+            position: absolute;
+            top: 51px;
+            right: 6px;
+            transform: rotateZ(48deg);
+        }
+        @-webkit-keyframes animate-positive {
+            0% { width: 0%;}
+        }
+        @keyframes animate-positive {
+            0% { width:0%; }
+        }
+
+    </style>
+</head>
+<body>
+<h1 style="color: #6060FF;font-weight: bold;margin-bottom: 2em">Speedtest-RS</h1>
+<div id="startStopBtn" onclick="startStop()"></div>
+<div id="test">
+    <div class="progress">
+        <div id="progress" class="progress-bar" style="width: 0%; background:#c612b4;">
+            <span id="progressText">0%</span>
+        </div>
+    </div>
+    <div class="testGroup">
+        <div class="testArea">
+            <div class="testName">Download</div>
+            <div id="download" class="meterText"></div>
+            <div class="unit">Mbps</div>
+        </div>
+        <div class="testArea">
+            <div class="testName">Upload</div>
+            <div id="upload" class="meterText"></div>
+            <div class="unit">Mbps</div>
+        </div>
+    </div>
+    <div class="testGroup">
+        <div class="testArea">
+            <div class="testName">Ping</div>
+            <div id="ping" class="meterText"></div>
+            <div class="unit">ms</div>
+        </div>
+        <div class="testArea">
+            <div class="testName">Jitter</div>
+            <div id="jitter" class="meterText"></div>
+            <div class="unit">ms</div>
+        </div>
+    </div>
+    <div id="ipArea">
+        IP Address: <span id="ip"></span>
+    </div>
+</div>
+<p><a href="./result">Show Results</a></p>
+<p><a href="https://github.com/zhanghanyun/speedtest-rs" target="_blank" style="color: #FF6060;font-size: 1.6em">Speedtest-rs</a></p>
+<script type="text/javascript">
+    let worker = null
+    let isRun = false
+    let ip = document.querySelector('#ip')
+    let ping = document.querySelector('#ping')
+    let jitter = document.querySelector('#jitter')
+    let download = document.querySelector('#download')
+    let upload = document.querySelector('#upload')
+    let progress = document.querySelector('#progress')
+    let progressText = document.querySelector('#progressText')
+    let startStopBtn = document.querySelector('#startStopBtn')
+    let request = new XMLHttpRequest()
+    let report = {}
+    request.open('GET', 'https://api.ip.sb/geoip/', true)
+    request.onload = function() {
+        if (this.status >= 200 && this.status < 400) {
+            let data = JSON.parse(this.response);
+            report.ip = data.ip
+            report.isp = data.isp
+            report.addr = `${data.country} ${data.region} ${data.city}`
+            ip.textContent=`${data.ip} - ${data.isp} - ${data.country} ${data.region} ${data.city}`
+        }
+    }
+    request.send()
+
+    function startStop(){
+        if(isRun){
+            worker.terminate()
+            isRun = false
+            startStopBtn.className='abort'
+        }else{
+            worker = new Worker('worker.js')
+            worker.postMessage('ping')
+            isRun = true
+            startStopBtn.className='running';
+            let i = 0
+            let j = 1
+            let pingArr = []
+            let downloadArr = []
+            let uploadArr = []
+            let jitterArr = []
+            worker.onmessage = (e)=>{
+                i+=3
+                switch (e.data[0]) {
+                    case 'ping':
+                        ping.textContent = e.data[1]
+                        pingArr.push(e.data[1])
+                        if (pingArr.length > 1){
+                            let jit = Math.abs(pingArr[j] - pingArr[j-1])
+                            jitter.textContent = jit
+                            jitterArr.push(jit)
+                            j++
+                        }
+                        break
+                    case 'download':
+                        download.textContent = e.data[1]
+                        downloadArr.push(e.data[1])
+                        break
+                    case 'upload':
+                        upload.textContent = e.data[1]
+                        uploadArr.push(e.data[1])
+                }
+                console.log("i = ",i)
+                if (i === 33){
+                    worker.postMessage('download')
+                }
+                if (i === 66){
+                    worker.postMessage('upload')
+                }
+                if (i === 99){
+                    i = 100
+                    let pingAvg = Math.round(pingArr.reduce((acc,val)=> acc+val,0) / pingArr.length)
+                    let downloadAvg = Math.round(downloadArr.reduce((acc,val)=> acc+val,0) / downloadArr.length)
+                    let uploadAvg = Math.round(uploadArr.reduce((acc,val)=> acc+val,0) / uploadArr.length)
+                    let jitterAvg = Math.round(jitterArr.reduce((acc,val)=> acc+val,0) / jitterArr.length)
+                    ping.textContent = pingAvg
+                    download.textContent = downloadAvg
+                    upload.textContent = uploadAvg
+                    jitter.textContent = jitterAvg
+                    console.log(pingAvg,downloadAvg,uploadAvg,jitterAvg)
+                    worker.terminate()
+                    isRun = false
+                    startStopBtn.className='abort'
+                    report.download = downloadAvg
+                    report.upload = uploadAvg
+                    report.ping = pingAvg
+                    report.jitter = jitterAvg
+                    let request = new XMLHttpRequest()
+                    request.open('POST','report',true)
+                    request.setRequestHeader('Content-Type',"application/json;charset=UTF-8")
+                    request.send(JSON.stringify(report))
+                }
+                progress.style.width = i+'%'
+                progressText.textContent = i + '%'
+                console.log(e.data)
+            }
+
+        }
+    }
+</script>
+</body>
+</html>

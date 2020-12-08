@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Speedtest-rs</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/layui-src@2.5.7/dist/css/layui.css"  media="all">
+  <style>
+    .footer {line-height: 30px; text-align: center;}
+    .footer a{padding:0 6px; font-weight: 300;}
+    .footer a:hover{color: green;}
+    .header {line-height: 30px; text-align: center;height:50px;padding-top:50px;}
+  </style>
+</head>
+<body>
+<div class="header">
+  <h1>Speedtest Results</h1>
+</div>
+
+<table class="layui-hide" id="test"></table>
+
+<div class="footer">
+  <p><a href="https://github.com/zhanghanyun/speedtest-rs" target="_blank" style="color: #FF6060;font-size: 1.6em">Speedtest-rs</a></p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/layui-src@2.5.7/dist/layui.js" charset="utf-8"></script>
+
+<script>
+    layui.use('table', function(){
+        var table = layui.table;
+
+        table.render({
+            elem: '#test'
+            ,url:'results'
+            ,cellMinWidth: 80
+            ,cols: [[
+                {field:'ip', title: 'IP Address'}
+                ,{field:'isp', title: 'Isp'}
+                ,{field:'addr', title: 'City'}
+                ,{field:'download', title: 'Download (Mbps)', sort: true, align: 'right'}
+                ,{field:'upload', title: 'Upload (Mbps)', sort: true, align: 'right'}
+                ,{field:'ping', title: 'Ping (ms)', sort: true, align: 'right'}
+                ,{field:'jitter', title: 'Jitter (ms)', sort: true, align: 'right'}
+                ,{field:'time', title: 'Time', sort: true}
+            ]]
+        });
+    });
+</script>
+
+</body>
+</html>
