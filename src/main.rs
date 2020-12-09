@@ -4,12 +4,15 @@ use rust_embed::RustEmbed;
 use chrono::Local;
 use pickledb::{PickleDb, PickleDbDumpPolicy};
 use serde::{Serialize, Deserialize};
+use std::net::IpAddr;
 
 #[derive(Clap)]
-#[clap(version = "1.0.0")]
+#[clap(version = "1.0.1")]
 struct Opts {
     #[clap(short, long, default_value = "8088", about = "Listen port")]
-    port: u16
+    port: u16,
+    #[clap(short, long, default_value = "0.0.0.0", about = "Listen ip")]
+    ip: String
 }
 
 #[derive(RustEmbed)]
@@ -71,7 +74,7 @@ async fn main() {
     let report = warp::path("report")
         .and(warp::body::json()).map(|mut data: Record| {
         data.time = Local::now().format("%Y-%m-%d %H:%M:%S").to_string();
-        println!("data {:?}", data);
+        println!("{:?}", data);
         let mut db = PickleDb::load_bin("report.db", PickleDbDumpPolicy::AutoDump).unwrap();
         db.ladd("report", &data).unwrap();
         reply::reply()
@@ -90,8 +93,7 @@ async fn main() {
     });
 
     let upload = warp::path("upload").and(warp::body::bytes())
-        .map(|bytes: warp::hyper::body::Bytes| {
-            println!("upload length: {}", bytes.len());
+        .map(|_bytes: warp::hyper::body::Bytes| {
             reply::reply()
         });
 
@@ -105,6 +107,6 @@ async fn main() {
     let route = index_html.or(results_html).or(worker).or(ping)
         .or(download).or(upload).or(report).or(results).or(favicon);
 
-    println!("Server listening on {}", opts.port);
-    warp::serve(route).run(([0, 0, 0, 0], opts.port)).await
+    println!("Server listening on {}:{}", opts.ip ,opts.port);
+    warp::serve(route).run((opts.ip.parse::<IpAddr>().unwrap(), opts.port)).await
 }
