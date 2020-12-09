@@ -4,11 +4,13 @@ No Flash, No Java, No Websocket, No Setup environment, No Docker.
 
 This is a very lightweight Speedtest implemented in [Rust](https://www.rust-lang.org), and only one executable file.
 
+![](https://vkceyugu.cdn.bspapp.com/VKCEYUGU-imgbed/1083733f-6225-49e7-b6b8-8026ae3ad35d.jpg)
+
 ## Installation
 
 You can download the precompiled binary [release](https://github.com/zhanghanyun/speedtest-rs/releases)
 
-### Build
+## Build
 
 1. Install [Rust](https://www.rust-lang.org/tools/install) 
 ```shell script
